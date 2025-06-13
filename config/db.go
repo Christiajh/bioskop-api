@@ -1,21 +1,22 @@
 package config
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-var DB *sql.DB
+var DB *sqlx.DB
 
 func ConnectDB() {
-	connStr := "host=localhost port=5432 user=postgres password=Sayakaje dbname=terlalu sslmode=disable"
+	connStr := "host=localhost port=5432 user=postgres password=Sayabag dbname=silogydb sslmode=disable"
+
 	var err error
-	DB, err = sql.Open("postgres", connStr)
+	DB, err = sqlx.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Gagal membuka koneksi:", err)
 	}
 
 	err = DB.Ping()
@@ -23,5 +24,5 @@ func ConnectDB() {
 		log.Fatal("Gagal konek ke database:", err)
 	}
 
-	fmt.Println("Koneksi database berhasil")
+	fmt.Println("✅ Koneksi database PostgreSQL berhasil")
 }
