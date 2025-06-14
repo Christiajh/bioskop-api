@@ -13,13 +13,13 @@ import (
 var DB *sqlx.DB
 
 func ConnectDB() {
-	// Muat .env file
+	// Muat .env file (opsional di local dev)
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("⚠️ File .env tidak ditemukan, menggunakan environment variable bawaan")
 	}
 
-	// Ambil variabel DATABASE_URL
+	// Ambil DATABASE_URL
 	connStr := os.Getenv("DATABASE_URL")
 	if connStr == "" {
 		log.Fatal("❌ DATABASE_URL belum diset di environment atau file .env")
@@ -31,11 +31,27 @@ func ConnectDB() {
 		log.Fatal("❌ Gagal membuka koneksi:", err)
 	}
 
-	// Ping untuk cek koneksi
+	// Ping
 	err = DB.Ping()
 	if err != nil {
-		log.Fatal("❌ Gagal konek ke database:", err)
+		log.Fatal("❌ Gagal koneksi ke database:", err)
 	}
 
 	fmt.Println("✅ Koneksi database PostgreSQL berhasil")
+
+	// 👇 Buat tabel bioskop jika belum ada
+	createTable := `
+	CREATE TABLE IF NOT EXISTS bioskop (
+		id SERIAL PRIMARY KEY,
+		nama VARCHAR(100) NOT NULL,
+		lokasi VARCHAR(100) NOT NULL,
+		rating REAL
+	);
+	`
+
+	_, err = DB.Exec(createTable)
+	if err != nil {
+		log.Fatal("❌ Gagal membuat tabel bioskop:", err)
+	}
+	fmt.Println("✅ Tabel bioskop sudah tersedia atau berhasil dibuat")
 }
